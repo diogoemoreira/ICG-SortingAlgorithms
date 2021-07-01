@@ -5,13 +5,16 @@ const helper = {
     initEmptyScene: function (sceneElements) {
         // Create the 3D scene
         sceneElements.sceneGraph = new THREE.Scene();
+        
+        // instantiate a Texture loader
+        sceneElements.loader = new THREE.TextureLoader();
 
         // Add camera
         const width = window.innerWidth;
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
         sceneElements.camera = camera;
-        camera.position.set(0, 5, 5);
+        camera.position.set(2, 10, 18);
         camera.lookAt(0, 0, 0);
 
         // Illumination
@@ -22,7 +25,7 @@ const helper = {
 
         // Add spotlight (with shadows)
         const spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
-        spotLight.position.set(-10, 20, 5);
+        spotLight.position.set(0, 20, 5);
         sceneElements.sceneGraph.add(spotLight);
 
         // Setup shadow properties for the spotlight

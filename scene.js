@@ -1,17 +1,27 @@
 "use strict";
 
+/*
+-> Simulate sorting algorithms in arrays of integers.
+-> The integers are represented by parallelepiped sorted by their height
+-> It must be possible to indicate if the elements are already sorted, 
+in reverse order, or in random positions.
+*/
+
 // To store the scene graph, and elements usefull to rendering the scene
 const sceneElements = {
     sceneGraph: null,
     camera: null,
     control: null,
     renderer: null,
+    loader: null,
 };
+
+let array = [];
 
 //Initialize the empty scene
 helper.initEmptyScene(sceneElements);
 //Add elements within the scene
-load3DObjects(sceneElements.sceneGraph);
+load3DObjects(sceneElements.sceneGraph, sceneElements.loader);
 
 //Animate
 requestAnimationFrame(computeFrame);
@@ -34,10 +44,10 @@ function resizeWindow(eventParam) {
 }
 
 // Create and insert in the scene graph the models of the 3D scene
-function load3DObjects(sceneGraph) {
+function load3DObjects(sceneGraph, loader) {
     // Create a ground plane
-    const planeGeometry = new THREE.PlaneGeometry(6, 6);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200, 200, 200)', side: THREE.DoubleSide });
+    const planeGeometry = new THREE.PlaneGeometry(20, 20);
+    const planeMaterial = new THREE.MeshPhongMaterial({ map: loader.load('https://i.imgur.com/U6WeR3u.png'), side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
 
@@ -46,22 +56,49 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     planeObject.receiveShadow = true;
 
-    // Create a cube
-    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
-    const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    sceneGraph.add(cubeObject);
+    // Create 8 cubes and give them random positions
+    var names = 0;
 
-    // Set position of the cube
-    // The base of the cube will be on the plane 
-    cubeObject.translateY(0.5);
+    for(var i=0; i<4;i+=0.5){
+        const cubeGeometry = new THREE.BoxGeometry(1, 1+i, 1);
+        const cubeMaterial = new THREE.MeshPhongMaterial({map:loader.load('https://img.freepik.com/free-photo/empty-poker-table-casino_131286-84.jpg?size=626&ext=jpg') });
+        const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-    // Set shadow property
-    cubeObject.castShadow = true;
-    cubeObject.receiveShadow = true;
+        // Set position of the cube
+        //cubeObject.position.set(-6+i*3,(1+i)/2+0.01,0);
 
-    // Name
-    cubeObject.name = "cube";
+        // Set shadow property
+        cubeObject.castShadow = true;
+        cubeObject.receiveShadow = true;
+
+        // Name
+        cubeObject.name = "cube"+names;
+        array.push(cubeObject);
+
+        names++;
+    }
+
+    shuffle(sceneGraph);
+    //AFTER TESTING PASS THIS LOOP TO THE METHOD shuffle(sceneGraph)
+    for(var i=0;i<array.length;i++){
+        console.log(array[i].name);
+
+        array[i].position.set(-6+(i/2)*3,array[i].geometry.parameters.height/2+0.01,0);
+
+        sceneGraph.add(array[i]);
+    }
+    bubbleSort();
+    for(var i=0;i<array.length;i++){
+        console.log("Bubble "+array[i].name);
+    }
+    shuffle(sceneGraph);
+    for(var i=0;i<array.length;i++){
+        console.log(array[i].name);
+    }
+    selectionSort();
+    for(var i=0;i<array.length;i++){
+        console.log("Selection "+array[i].name);
+    }
 }
 
 // Displacement value
@@ -71,9 +108,6 @@ var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
-
-    // THE SPOT LIGHT
-
     // Rendering
     helper.render(sceneElements);
 
@@ -83,3 +117,62 @@ function computeFrame(time) {
     // Call for the next frame
     requestAnimationFrame(computeFrame);
 }
+
+function bubbleSort(){
+    //iterate through the array and confirm if the next element
+    //is lower than the current one swap them
+    //do this until the array is fully sorted
+    var iteration=1;
+    var sorted = false;
+    while(sorted!=true || iteration<array.length-1){
+        sorted=true; //if no swaps are made then the array is sorted
+        for(var i=0;i<array.length-iteration;i++){
+            if(array[i].geometry.parameters.height>array[i+1].geometry.parameters.height){
+                sorted=false;
+                [array[i], array[i+1]] = [
+                    array[i+1], array[i]];
+            }
+        }
+        iteration++;
+    }
+}
+
+function selectionSort(){
+    //find the lowest element and swap it to the first position of the array
+    var iteration=0;
+    var sorted = false;
+    while(sorted!=true || iteration<array.length-1){
+        sorted=true; //if no swaps are made then the array is sorted
+        var lowest=iteration; //index of the lowest number
+        for(var i=iteration;i<array.length-1;i++){
+            if(array[lowest].geometry.parameters.height>array[i+1].geometry.parameters.height){
+                sorted=false;
+                lowest=i+1;
+            }
+        }
+        //swap the lowest element with the "first" element of the array
+        [array[lowest], array[iteration]] = [
+            array[iteration], array[lowest]];
+        iteration++;
+    }
+}
+
+function shuffle(sceneGraph) {
+    //Fisher-Yates (aka Knuth) Shuffle
+    //from https://github.com/coolaj86/knuth-shuffle
+    var currentIndex = array.length,  randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    
+  }
