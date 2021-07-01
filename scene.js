@@ -16,7 +16,9 @@ const sceneElements = {
     loader: null,
 };
 
-let array = [];
+let array = [],
+    animationQueue = [],
+    speed=0.2;
 
 //Initialize the empty scene
 helper.initEmptyScene(sceneElements);
@@ -31,6 +33,8 @@ requestAnimationFrame(computeFrame);
 // Event Listeners
 
 window.addEventListener('resize', resizeWindow); //resize window
+document.getElementById('bubbleSort').addEventListener('click', bubbleSort);
+document.getElementById('selectionSort').addEventListener('click', selectionSort);
 
 // Update render image size and camera aspect when the window is resized
 function resizeWindow(eventParam) {
@@ -79,7 +83,7 @@ function load3DObjects(sceneGraph, loader) {
     }
 
     shuffle(sceneGraph);
-    //AFTER TESTING PASS THIS LOOP TO THE METHOD shuffle(sceneGraph)
+    //add cubes to the scene
     for(var i=0;i<array.length;i++){
         console.log(array[i].name);
 
@@ -87,27 +91,10 @@ function load3DObjects(sceneGraph, loader) {
 
         sceneGraph.add(array[i]);
     }
-    bubbleSort();
-    for(var i=0;i<array.length;i++){
-        console.log("Bubble "+array[i].name);
-    }
-    shuffle(sceneGraph);
-    for(var i=0;i<array.length;i++){
-        console.log(array[i].name);
-    }
-    selectionSort();
-    for(var i=0;i<array.length;i++){
-        console.log("Selection "+array[i].name);
-    }
+    //
 }
 
-// Displacement value
-
-var delta = 0.1;
-
-var dispX = 0.2, dispZ = 0.2;
-
-function computeFrame(time) {
+function computeFrame(time) {    
     // Rendering
     helper.render(sceneElements);
 
@@ -130,10 +117,13 @@ function bubbleSort(){
             if(array[i].geometry.parameters.height>array[i+1].geometry.parameters.height){
                 sorted=false;
                 [array[i], array[i+1]] = [
-                    array[i+1], array[i]];
+                    array[i+1], array[i]]; //swap position
             }
         }
         iteration++;
+    }
+    for(var i=0;i<array.length;i++){
+        console.log("Bubble "+array[i].name);
     }
 }
 
@@ -150,10 +140,13 @@ function selectionSort(){
                 lowest=i+1;
             }
         }
-        //swap the lowest element with the "first" element of the array
+        //swap the lowest/smallest element with the "first" element of the array
         [array[lowest], array[iteration]] = [
             array[iteration], array[lowest]];
         iteration++;
+    }
+    for(var i=0;i<array.length;i++){
+        console.log("Selection "+array[i].name);
     }
 }
 
@@ -172,7 +165,5 @@ function shuffle(sceneGraph) {
       // And swap it with the current element.
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
-    }
-  
-    
+    }  
   }

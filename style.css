@@ -1,3 +1,27 @@
 body { 
 	margin: 0px;
+	overflow: hidden;
+}
+
+.menu{
+	position: absolute;
+	text-align: center;
+	z-index: 1;
+	top: 0;
+	padding: 15px 10px 10px 15px;
+	border-radius: 5px;
+	margin: 3px;
+	background-color:rgba(27, 27, 27, 0.9);
+}
+
+button{
+    border-radius: 10px;
+	width: 100%;
+    display: block;
+	text-align: center;
+    cursor: pointer;
+	color: #fff;
+    background-color: #616161;
+	padding: 8px 22px;
+	margin-bottom: 5px;
 }
