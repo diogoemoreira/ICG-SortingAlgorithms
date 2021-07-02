@@ -18,7 +18,10 @@ const sceneElements = {
 
 let array = [],
     animationQueue = [],
-    speed=0.2;
+    speed=10,
+    animating=false,
+    clock= new THREE.Clock(),
+    anim;
 
 //Initialize the empty scene
 helper.initEmptyScene(sceneElements);
@@ -68,9 +71,6 @@ function load3DObjects(sceneGraph, loader) {
         const cubeMaterial = new THREE.MeshPhongMaterial({map:loader.load('https://img.freepik.com/free-photo/empty-poker-table-casino_131286-84.jpg?size=626&ext=jpg') });
         const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-        // Set position of the cube
-        //cubeObject.position.set(-6+i*3,(1+i)/2+0.01,0);
-
         // Set shadow property
         cubeObject.castShadow = true;
         cubeObject.receiveShadow = true;
@@ -95,6 +95,68 @@ function load3DObjects(sceneGraph, loader) {
 }
 
 function computeFrame(time) {    
+    if(animating){
+        var delta = clock.getDelta();
+        //left cube
+        var leftCube = sceneElements.sceneGraph.getObjectByName(anim.leftCube);
+        var rightCube = sceneElements.sceneGraph.getObjectByName(anim.rightCube);
+        if(leftCube.position.z>-2 && leftCube.position.x == anim.leftX){
+            leftCube.translateZ(-1*speed*delta);
+            if(leftCube.position.z<-2){
+                //prevents overshoot
+                leftCube.position.z=-2;
+            }
+        }
+        else if(leftCube.position.x<anim.rightX){
+            leftCube.translateX(speed*delta);
+            if(leftCube.position.x>anim.rightX){
+                //prevents overshoot
+                leftCube.position.x = anim.rightX;
+            }
+        }
+        else{
+            console.log("adadada");
+            leftCube.translateZ(speed*delta);
+            if(leftCube.position.z>0){
+                //prevents overshoot
+                leftCube.position.z=0;
+            }
+        }
+
+        //right cube
+        if(rightCube.position.z<2 && rightCube.position.x == anim.rightX){
+            rightCube.translateZ(speed*delta);
+            if(rightCube.position.z>2){
+                //prevents overshoot
+                rightCube.position.z=2;
+            }
+        }
+        else if(rightCube.position.x>anim.leftX){
+            rightCube.translateX(-1*speed*delta);
+            if(rightCube.position.x<anim.leftX){
+                //prevents overshoot
+                rightCube.position.x = anim.leftX;
+            }
+        }
+        else{
+            rightCube.translateZ(-1*speed*delta);
+            if(rightCube.position.z<0){
+                //prevents overshoot
+                rightCube.position.z=0;
+            }
+        }
+        if( (leftCube.position.x == anim.rightX && leftCube.position.z == 0) && 
+                (rightCube.position.x == anim.leftX && rightCube.position.z == 0)){
+                    animating=false;
+                }
+    }
+    else{
+        if(animationQueue.length>0){
+            anim = animationQueue.shift();
+            animating=true;
+        }
+    }
+
     // Rendering
     helper.render(sceneElements);
 
@@ -116,6 +178,13 @@ function bubbleSort(){
         for(var i=0;i<array.length-iteration;i++){
             if(array[i].geometry.parameters.height>array[i+1].geometry.parameters.height){
                 sorted=false;
+                animationQueue.push({
+                    //object with the cube that will move and their final position
+                    leftCube: array[i].name,
+                    rightCube: array[i+1].name,
+                    leftX: -6+(i/2)*3,
+                    rightX: -6+((i+1)/2)*3,
+                });
                 [array[i], array[i+1]] = [
                     array[i+1], array[i]]; //swap position
             }
@@ -140,9 +209,19 @@ function selectionSort(){
                 lowest=i+1;
             }
         }
-        //swap the lowest/smallest element with the "first" element of the array
-        [array[lowest], array[iteration]] = [
-            array[iteration], array[lowest]];
+        if(lowest!=iteration){
+            //swap the lowest/smallest element with the "first" element of the array            
+            animationQueue.push({
+                //object with the cube that will move and their final position
+                leftCube: array[iteration].name,
+                rightCube: array[lowest].name,
+                leftX: -6+(iteration/2)*3,
+                rightX: -6+((lowest)/2)*3,
+            });
+            [array[lowest], array[iteration]] = [
+                array[iteration], array[lowest]];
+        }
+        
         iteration++;
     }
     for(var i=0;i<array.length;i++){
