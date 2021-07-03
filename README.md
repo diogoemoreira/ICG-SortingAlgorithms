@@ -10,10 +10,29 @@ Here we have a representation of some sorting algorithms
 
 ## Bubble sort
 
+ Bubble sort is a simple sorting algorithm where it compares every element to the next element.
+ This is done until the array is sorted.
+
 ![Bubble Sort](imgs/bubble_sort.png)
 
 ## Selection sort
 
+The selection sort algorithm sorts an array by repeatedly finding the minimum element from unsorted part and putting it at the beginning.
+For this algorithm we maintain two subarrays, one which is sorted and one which isn't.
+
+1. Find the lowest element from the unsorted array
+2. Put the lowest element in the sorted array
+3. This is done until the unsorted array is empty
+
 ![Selection Sort](imgs/selection_sort.png)
 
 ## Quick sort
+
+Quick sort picks an element as pivot and partitions the given array around the picked pivot.  
+
+1. Always pick first element as pivot.  
+2. Always pick last element as pivot  
+3. Pick a random element as pivot.  
+4. Pick median as pivot.  
+
+![Quick Sort](imgs/quick_sort.png)
