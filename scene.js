@@ -23,7 +23,8 @@ let array = [],
     animating=false,
     clock= new THREE.Clock(),
     swapTime=0,
-    anim;
+    anim,
+    startingPoint=-5.25;
 
 //Initialize the empty scene
 helper.initEmptyScene(sceneElements);
@@ -38,9 +39,12 @@ requestAnimationFrame(computeFrame);
 // Event Listeners
 
 window.addEventListener('resize', resizeWindow); //resize window
+document.getElementById('reverse').addEventListener('click', reverseSort);
 document.getElementById('shuffle').addEventListener('click', shuffle);
 document.getElementById('bubbleSort').addEventListener('click', bubbleSort);
 document.getElementById('selectionSort').addEventListener('click', selectionSort);
+document.getElementById('quickSort').addEventListener('click', quickSort);
+document.getElementById('insertionSort').addEventListener('click', insertionSort);
 
 // Update render image size and camera aspect when the window is resized
 function resizeWindow(eventParam) {
@@ -58,7 +62,7 @@ function load3DObjects(sceneGraph, loader) {
     materials['texture'] = new THREE.MeshPhongMaterial({map:loader.load('https://img.freepik.com/free-photo/empty-poker-table-casino_131286-84.jpg?size=626&ext=jpg') });
     materials['color'] = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     // Create a ground plane
-    const planeGeometry = new THREE.PlaneGeometry(20, 20);
+    const planeGeometry = new THREE.PlaneGeometry(15, 15);
     const planeMaterial = new THREE.MeshPhongMaterial({ map: loader.load('https://i.imgur.com/U6WeR3u.png'), side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
@@ -86,26 +90,23 @@ function load3DObjects(sceneGraph, loader) {
 
         names++;
     }
-
-    shuffle();
     //add cubes to the scene
     for(var i=0;i<array.length;i++){
-        console.log(array[i].name);
-
-        array[i].position.set(-6+(i/2)*3,array[i].geometry.parameters.height/2+0.01,0);
+        array[i].position.set(startingPoint+(i/2)*3,array[i].geometry.parameters.height/2+0.01,0);
 
         sceneGraph.add(array[i]);
     }
     //
 }
 
+//Bubble sort
 function bubbleSort(){
     //iterate through the array and confirm if the next element
     //is lower than the current one swap them
     //do this until the array is fully sorted
     var iteration=1;
     var sorted = false;
-    while(sorted!=true && iteration<array.length-1){
+    while(sorted!=true && iteration<array.length){
         sorted=true; //if no swaps are made then the array is sorted
         for(var i=0;i<array.length-iteration;i++){
             if(array[i].geometry.parameters.height>array[i+1].geometry.parameters.height){
@@ -115,8 +116,8 @@ function bubbleSort(){
                     swapping: true,
                     leftCube: array[i].name,
                     rightCube: array[i+1].name,
-                    leftX: -6+(i/2)*3,
-                    rightX: -6+((i+1)/2)*3,
+                    leftX: startingPoint+(i/2)*3,
+                    rightX: startingPoint+((i+1)/2)*3,
                 });
                 [array[i], array[i+1]] = [
                     array[i+1], array[i]]; //swap position
@@ -133,7 +134,9 @@ function bubbleSort(){
         iteration++;
     }
 }
+//end of Bubble sort
 
+//Selection sort
 function selectionSort(){
     //find the lowest element and swap it to the first position of the array
     var iteration=0;
@@ -165,8 +168,8 @@ function selectionSort(){
                 swapping: true,
                 leftCube: array[iteration].name,
                 rightCube: array[lowest].name,
-                leftX: -6+(iteration/2)*3,
-                rightX: -6+((lowest)/2)*3,
+                leftX: startingPoint+(iteration/2)*3,
+                rightX: startingPoint+((lowest)/2)*3,
             });
             [array[lowest], array[iteration]] = [
                 array[iteration], array[lowest]];
@@ -174,10 +177,128 @@ function selectionSort(){
         iteration++;
     }
 }
+//end of Selection sort
 
+//Quick sort
 function quickSort(){
-    
+    doQuickSort();
 }
+function doQuickSort(arr=array, left=0, right=array.length-1){
+    var p;
+    if(left<right){
+        p = partition(arr,left,right);
+
+        // Sort elements before partition
+        // and after partition
+        doQuickSort(arr, left, p-1);
+        doQuickSort(arr, p+1, right);
+    }
+}
+
+function partition(arr, left, right){
+    var pivot_index = left;
+    var pivot = arr[pivot_index];
+
+    while (left<right){
+        //increment left pointer until we find an element bigger than pivot
+        while(left<arr.length && 
+                arr[left].geometry.parameters.height <= pivot.geometry.parameters.height){
+                    left++;
+        }
+
+        //decrement the right pointer until it finds an element smaller than pivot
+        while(right>pivot_index && arr[right].geometry.parameters.height >= pivot.geometry.parameters.height){
+            right--;
+        }
+
+        //if left and right pointers have not crossed each other, swap the elements
+        if(left<right){
+            animationQueue.push({
+                //object with the cube that will move and their final position
+                swapping: true,
+                leftCube: arr[left].name,
+                rightCube: arr[right].name,
+                leftX: startingPoint+(left/2)*3,
+                rightX: startingPoint+(right/2)*3,
+            });
+            [arr[left], arr[right]] = [
+                arr[right], arr[left]];
+        }
+        else if(left<arr.length){
+            animationQueue.push({
+                //object with the cube that will move and their final position
+                swapping: false,
+                leftCube: arr[left].name,
+                rightCube: arr[right].name,
+            });
+        }
+    }
+
+    //swap pivot element with element on the right pointer
+    //this puts pivot in its right position
+    animationQueue.push({
+        //object with the cube that will move and their final position
+        swapping: true,
+        leftCube: arr[pivot_index].name,
+        rightCube: arr[right].name,
+        leftX: startingPoint+(pivot_index/2)*3,
+        rightX: startingPoint+(right/2)*3,
+    });
+    [arr[pivot_index], arr[right]] = [
+        arr[right], arr[pivot_index]];
+    
+    //return right pointer to divide the arry into 2 parts
+    return right;
+}
+//end of Quick sort
+
+//Insertion sort
+function insertionSort(){
+    var key,j;
+   
+    for(var i=1; i<array.length;i++){
+        key=array[i];
+
+        // Move elements of arr[0..i-1], that are greater than key, to one position ahead of their current position
+        j=i-1;
+        while(j>-1){
+            if(key.geometry.parameters.height< array[j].geometry.parameters.height){
+                animationQueue.push({
+                    //object with the cube that will move and their final position
+                    swapping: true,
+                    leftCube: array[j].name,
+                    rightCube: array[j+1].name,
+                    leftX: startingPoint+(j/2)*3,
+                    rightX: startingPoint+((j+1)/2)*3,
+                });
+                [array[j+1], array[j]] = [
+                    array[j], array[j+1]]; 
+                j--;
+            }
+            else{
+                animationQueue.push({
+                    //object with the cube that will move and their final position
+                    swapping: false,
+                    leftCube: array[j].name,
+                    rightCube: key.name,
+                });
+                break;
+            }
+        }
+        if(array[j+1]!=key){
+            animationQueue.push({
+                //object with the cube that will move and their final position
+                swapping: true,
+                leftCube: array[j+1].name,
+                rightCube: key.name,
+                leftX: startingPoint+((j+1)/2)*3,
+                rightX: startingPoint+(i/2)*3,
+            });
+            array[j+1] = key;
+        }
+    }
+}
+//end of Insertion sort
 
 function shuffle() {
     //Fisher-Yates (aka Knuth) Shuffle
@@ -198,16 +319,15 @@ function shuffle() {
     }  
 }
 
-function disableButtons(){
-    document.getElementById('shuffle').disabled=true;
-    document.getElementById('bubbleSort').disabled=true;
-    document.getElementById('selectionSort').disabled=true;
-}
-
-function enableButtons(){
-    document.getElementById('shuffle').disabled=false;
-    document.getElementById('bubbleSort').disabled=false;
-    document.getElementById('selectionSort').disabled=false;
+function reverseSort(){
+    var temp=[];
+    for(var i=array.length-1;i>=0;i--){
+        temp.push(sceneElements.sceneGraph.getObjectByName("cube"+i));
+    }
+    array=temp;
+    for(var i=0;i<array.length;i++){
+        array[i].position.set(-5.25+(i/2)*3,array[i].geometry.parameters.height/2+0.01,0);
+    }
 }
 
 function computeFrame(time) {    
@@ -235,7 +355,6 @@ function computeFrame(time) {
                 }
             }
             else{
-                console.log("adadada");
                 leftCube.translateZ(speed*delta);
                 if(leftCube.position.z>0){
                     //prevents overshoot
@@ -275,7 +394,7 @@ function computeFrame(time) {
         }
         else{ //show which cubes we are comparing
             swapTime+=delta;
-            if(swapTime>1){
+            if(swapTime>0.5){
                 leftCube.material=materials['texture'];
                 rightCube.material=materials['texture'];
                 animating=false;
@@ -300,4 +419,18 @@ function computeFrame(time) {
 
     // Call for the next frame
     requestAnimationFrame(computeFrame);
+}
+
+function disableButtons(){
+    document.getElementById('shuffle').disabled=true;
+    document.getElementById('bubbleSort').disabled=true;
+    document.getElementById('selectionSort').disabled=true;
+    document.getElementById('quickSort').disabled=true;
+}
+
+function enableButtons(){
+    document.getElementById('shuffle').disabled=false;
+    document.getElementById('bubbleSort').disabled=false;
+    document.getElementById('selectionSort').disabled=false;
+    document.getElementById('quickSort').disabled=false;
 }

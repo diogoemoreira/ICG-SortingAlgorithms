@@ -21,7 +21,7 @@ The selection sort algorithm sorts an array by repeatedly finding the minimum el
 For this algorithm we maintain two subarrays, one which is sorted and one which isn't.
 
 1. Find the lowest element from the unsorted array
-2. Put the lowest element in the sorted array
+2. Put the lowest element in the sorted array next to the previous elements
 3. This is done until the unsorted array is empty
 
 ![Selection Sort](imgs/selection_sort.png)
@@ -36,3 +36,11 @@ Quick sort picks an element as pivot and partitions the given array around the p
 4. Pick median as pivot.  
 
 ![Quick Sort](imgs/quick_sort.png)
+
+## Insertion sort
+
+Insertion sort splits the array into two parts, a sorted and an unsorted part. Values from the unsorted part are picked and placed at the correct position in the sorted part.
+
+1. Iterate from the first element to the last one
+2. Compare the current element (key) to its predecessor
+3. If the key element is smaller than its predecessor, compare it to the elements before until you find its right position
