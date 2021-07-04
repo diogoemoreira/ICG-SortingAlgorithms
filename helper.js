@@ -9,6 +9,18 @@ const helper = {
         // instantiate a Texture loader
         sceneElements.loader = new THREE.TextureLoader();
 
+        // SKYBOX
+        var skyBoxGeometry = new THREE.BoxBufferGeometry(500, 500, 500);
+        var skyBoxMaterial = new THREE.MeshPhongMaterial({
+            map: sceneElements.loader.load('https://i.imgur.com/qu0w7wA.jpeg'),
+            side: THREE.BackSide
+        });
+        sceneElements.skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+        sceneElements.sceneGraph.add(sceneElements.skyBox);
+        sceneElements.sceneGraph.background= sceneElements.loader.load('https://i.imgur.com/qu0w7wA.jpeg');
+        sceneElements.sceneGraph.fog = new THREE.FogExp2(0x000000, 0.0005);
+
+
         // Add camera
         const width = window.innerWidth;
         const height = window.innerHeight;

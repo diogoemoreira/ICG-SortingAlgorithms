@@ -14,6 +14,7 @@ const sceneElements = {
     control: null,
     renderer: null,
     loader: null,
+    skyBox: null,
 };
 
 let array = [],
@@ -45,6 +46,7 @@ document.getElementById('bubbleSort').addEventListener('click', bubbleSort);
 document.getElementById('selectionSort').addEventListener('click', selectionSort);
 document.getElementById('quickSort').addEventListener('click', quickSort);
 document.getElementById('insertionSort').addEventListener('click', insertionSort);
+document.getElementById('stopAnim').addEventListener('click', stopAnim);
 
 // Update render image size and camera aspect when the window is resized
 function resizeWindow(eventParam) {
@@ -317,6 +319,10 @@ function shuffle() {
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
     }  
+    for(var i=0;i<array.length;i++){
+        array[i].position.z=0;
+        array[i].material=materials["texture"];
+    }
 }
 
 function reverseSort(){
@@ -433,4 +439,10 @@ function enableButtons(){
     document.getElementById('bubbleSort').disabled=false;
     document.getElementById('selectionSort').disabled=false;
     document.getElementById('quickSort').disabled=false;
+}
+
+function stopAnim(){
+    animationQueue=[];
+    animating=false;
+    shuffle();
 }
