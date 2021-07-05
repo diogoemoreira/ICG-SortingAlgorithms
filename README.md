@@ -30,10 +30,9 @@ For this algorithm we maintain two subarrays, one which is sorted and one which 
 
 Quick sort picks an element as pivot and partitions the given array around the picked pivot.  
 
-1. Always pick first element as pivot.  
-2. Always pick last element as pivot  
-3. Pick a random element as pivot.  
-4. Pick median as pivot.  
+1. Chooses an element as pivot
+2. Orders the rest of elements in two parts, one where every element is smaller than pivot and one where every element is bigger than pivot
+3. Repeat this process for both parts until the array is sorted
 
 ![Quick Sort](imgs/quick_sort.png)
 
@@ -44,3 +43,5 @@ Insertion sort splits the array into two parts, a sorted and an unsorted part. V
 1. Iterate from the first element to the last one
 2. Compare the current element (key) to its predecessor
 3. If the key element is smaller than its predecessor, compare it to the elements before until you find its right position
+
+![Insertion Sort](imgs/insertion_sort.png)
