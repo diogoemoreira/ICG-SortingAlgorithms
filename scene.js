@@ -432,6 +432,8 @@ function disableButtons(){
     document.getElementById('bubbleSort').disabled=true;
     document.getElementById('selectionSort').disabled=true;
     document.getElementById('quickSort').disabled=true;
+    document.getElementById('insertionSort').disabled=true;
+    document.getElementById('reverse').disabled=true;
 }
 
 function enableButtons(){
@@ -439,10 +441,18 @@ function enableButtons(){
     document.getElementById('bubbleSort').disabled=false;
     document.getElementById('selectionSort').disabled=false;
     document.getElementById('quickSort').disabled=false;
+    document.getElementById('insertionSort').disabled=false;
+    document.getElementById('reverse').disabled=false;
 }
 
 function stopAnim(){
     animationQueue=[];
     animating=false;
+    clock = new THREE.Clock();
+    //add cubes to the scene
+    for(var i=0;i<array.length;i++){
+        array[i].position.set(startingPoint+(i/2)*3,array[i].geometry.parameters.height/2+0.01,0);
+    }
+    enableButtons();
     shuffle();
 }
