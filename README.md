@@ -44,4 +44,4 @@ Insertion sort splits the array into two parts, a sorted and an unsorted part. V
 2. Compare the current element (key) to its predecessor
 3. If the key element is smaller than its predecessor, compare it to the elements before until you find its right position
 
-![Insertion Sort](imgs/insertion_sort.png)
+![Insertion Sort](imgs/insertion_sort.PNG)
